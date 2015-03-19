@@ -1,0 +1,11 @@
+name: ArenaBlutonium
+main: mc.adambor.ab.Main
+version: 0.0.1
+author: adambor
+depend: [BattleArena]
+description: Version 0 of ArenaBlutonium
+commands:
+  ab:
+    description: Arena Blutonium
+    aliases: [ab]
+    usage: /ab <addBlutonium|clearBlutonium|addCompressors|clearCompressors>

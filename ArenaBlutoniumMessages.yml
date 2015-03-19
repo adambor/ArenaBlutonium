@@ -1,0 +1,9 @@
+version: 1.2
+
+
+ArenaBlutonium:
+
+    new_collector: "&2Player %p is now collector for %t &2team"
+
+    ### Use %p to replace with player name
+    ### Use %t to replace with player team
