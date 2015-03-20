@@ -20,6 +20,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -162,6 +164,13 @@ public class ArenaBlutonium extends Arena {
 				}
 			}
 	}
+	@ArenaEventHandler
+	public void onPlayerQ(PlayerDropItemEvent e){
+		if(e.getItemDrop().getItemStack().getType().equals(Material.DIAMOND)){
+			throwBlutonium(e.getPlayer());
+			e.getItemDrop().remove();
+		}
+	}
 	public void spawnCompressors(){
 		for(Location l:compressorsL){
 			l.getChunk().load();
@@ -171,6 +180,9 @@ public class ArenaBlutonium extends Arena {
 			comp.setCustomName(ChatColor.GREEN+"Compressor");
 			comp.setCustomNameVisible(true);
 			comp.setHelmet(new ItemStack(Material.REDSTONE_BLOCK));
+			comp.setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+			comp.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+			comp.setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 			compressors.add(comp);
 		}
 	}
@@ -224,6 +236,12 @@ public class ArenaBlutonium extends Arena {
 		is.setItemMeta(im);
 		blutonium = is;
 	}
+	@ArenaEventHandler
+	public void interactEvent(PlayerInteractAtEntityEvent e){
+	if(e.getRightClicked().getType().equals(EntityType.ARMOR_STAND)){
+		e.setCancelled(true);
+	}
+	}
 	public void throwBlutonium(final Player p){
 		p.getInventory().remove(blutonium);
 		p.getLocation().getWorld().playSound(p.getLocation(), Sound.LAVA_POP, 1, 5);
@@ -241,7 +259,6 @@ public class ArenaBlutonium extends Arena {
 							 ArenaPlayer apent = BattleArena.toArenaPlayer((Player) ent);
 							 if(!BattleArena.toArenaPlayer(p).getTeam().getPlayers().contains(apent)){
 								apent.getPlayer().damage(30.0D,p);
-								match.sendMessage("For entity: "+ent);
 							 }
 						 }
 					}
