@@ -1,4 +1,4 @@
-# ArenaBlutonium
+![alt tag](http://dev.bukkit.org/media/images/82/382/ArenaBlutonium_2.png)
 
 An extraction minigame mode from the popular game LoadOut.
 
@@ -40,7 +40,7 @@ If you found any bug or want new feature to be added leave a comment or use tick
 
 ## Requirements
 
-This plugin is made to hook into BattleArena, so you also need to download it as well http://dev.bukkit.org/bukkit-plugins/battlearena2
+This plugin is made to hook into [BattleArena](http://dev.bukkit.org/bukkit-plugins/battlearena2), so you also need to download it as well 
 
 ## Official bukkit page
 
