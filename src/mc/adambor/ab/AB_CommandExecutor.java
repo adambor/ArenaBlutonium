@@ -3,6 +3,7 @@ package mc.adambor.ab;
 import mc.alk.arena.BattleArena;
 import mc.alk.arena.executors.CustomCommandExecutor;
 import mc.alk.arena.executors.MCCommand;
+
 import org.bukkit.entity.Player;
 
 public class AB_CommandExecutor extends CustomCommandExecutor{
@@ -18,6 +19,13 @@ public class AB_CommandExecutor extends CustomCommandExecutor{
 		arena.addBlutonium(sender.getLocation(),index-1);
 		BattleArena.saveArenas(Main.plugin);
 		return sendMessage(sender,"&2Blutonium with index:&6 "+index+"added!");
+	}
+	@MCCommand(cmds={"setScoreToWin"}, admin=true)
+	public static boolean setScoreToWin(Player sender, Integer score){
+		Main.plugin.getConfig().set("scoreToWin", score);
+		Main.plugin.saveConfig();
+		Main.plugin.reloadConfig();
+	    return sendMessage(sender, "&2Score to win this game is now: "+score);
 	}
 	@MCCommand(cmds={"clearCompressors"}, admin=true)
 	public static boolean clearCompressors(Player sender, ArenaBlutonium arena) {

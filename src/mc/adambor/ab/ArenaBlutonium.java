@@ -36,18 +36,18 @@ import mc.alk.arena.objects.arenas.Arena;
 import mc.alk.arena.objects.events.ArenaEventHandler;
 import mc.alk.arena.objects.messaging.MatchMessageHandler;
 import mc.alk.arena.objects.teams.ArenaTeam;
+import mc.alk.arena.objects.victoryconditions.VictoryCondition;
 import mc.alk.arena.serializers.Persist;
 import mc.alk.scoreboardapi.api.SEntry;
 import mc.alk.scoreboardapi.api.SObjective;
 import mc.alk.scoreboardapi.api.SScoreboard;
-import mc.alk.scoreboardapi.scoreboard.SAPIDisplaySlot;
 
 public class ArenaBlutonium extends Arena {
 	@Persist 
 	List<Location> compressorsL = new ArrayList<Location>();
 	@Persist 
 	HashMap<Integer,Location> itemsL = new HashMap<Integer, Location>();
-	
+	Victory scores;
 	Integer respawncounter = 0;
 	Integer brespawning;
 	final List<ArmorStand> compressors = new ArrayList<ArmorStand>();
@@ -57,22 +57,26 @@ public class ArenaBlutonium extends Arena {
 	ItemStack blutonium = new ItemStack(Material.DIAMOND);
 	SScoreboard scoreb;
     SObjective objective;
-    HashMap<ArenaTeam,SEntry> teams = new HashMap<ArenaTeam,SEntry>();
     HashMap<ArenaTeam,SEntry> collectorsent = new HashMap<ArenaTeam,SEntry>();
     HashMap<ArenaTeam,Integer> collectorsentint = new HashMap<ArenaTeam,Integer>();
     MatchMessageHandler mmh;
     Random rand = new Random();
+    static Integer pointsToWin = 30;
 	
+	public void onOpen(){
+		mmh = match.getMessageHandler();
+        VictoryCondition vc = getMatch().getVictoryCondition(Victory.class);
+        scores = (Victory) (vc != null ? vc : new Victory(getMatch()));
+        getMatch().addVictoryCondition(scores);
+    }
 	@Override
 	public void onStart(){
-		mmh = match.getMessageHandler();
 		scoreb = match.getScoreboard();
-		objective = scoreb.registerNewObjective( "ab", "ArenaBlutonium", "&bBlutonium captured", SAPIDisplaySlot.SIDEBAR);
-		objective.setDisplayTeams(false);
+		objective = scores.scores;
+		objective.setDisplayName(ChatColor.AQUA+"ArenaBlutonium");
 		objective.setDisplayPlayers(false);
 		int i = -1;
 		for(ArenaTeam team : match.getTeams()){
-			teams.put(team, objective.addEntry(team.getDisplayName(), 0));
 			objective.addEntry(team.getDisplayName()+" collector:", i);
 			SEntry ent = objective.addEntry(team.getDisplayName()+"*",i-1);
 			collectorsent.put(team, ent);
@@ -153,17 +157,21 @@ public class ArenaBlutonium extends Arena {
 				for(Entity ent:p.getNearbyEntities(3.0,3.0,3.0)){
 					if(compressors.contains(ent)){
 						ArenaPlayer ap = BattleArena.toArenaPlayer(p);
-						if(collectors.containsValue(ap) && p.getInventory().contains(blutonium)){
-							p.getInventory().remove(blutonium);
-							Location loc = ent.getLocation();
-							loc.setY(ent.getLocation().getY()+1.5D);
-							loc.getWorld().playEffect(loc, Effect.MOBSPAWNER_FLAMES, 1);
-							objective.setPoints(teams.get(ap.getTeam()), objective.getPoints(teams.get(ap.getTeam()))+1);
+						if(collectors.containsValue(ap) && p.getInventory().contains(blutonium) && scores.scores.getPoints(ap.getTeam()) < pointsToWin){
+								p.getInventory().remove(blutonium);
+								Location loc = ent.getLocation();
+								loc.setY(ent.getLocation().getY()+1.5D);
+								loc.getWorld().playEffect(loc, Effect.MOBSPAWNER_FLAMES, 1);
+								match.sendMessage("Score now: "+scores.addScore(ap.getTeam(), ap)+" - Score to win: "+pointsToWin);
+								if(scores.scores.getPoints(ap.getTeam()) >= pointsToWin){
+									setWinner(ap.getTeam());
+								}
+							}
 						}
 					}
 				}
 			}
-	}
+	
 	@ArenaEventHandler
 	public void onPlayerQ(PlayerDropItemEvent e){
 		if(e.getItemDrop().getItemStack().getType().equals(Material.DIAMOND)){
